@@ -7,7 +7,6 @@ pub enum WebsocketEvent<'a> {
     Text(&'a [u8]),
     Binary(&'a [u8]),
     Ping,
-    Pong,
     Close,
     Disconnect,
 }
@@ -24,7 +23,6 @@ impl<'a> WebsocketEvent<'a> {
                     "TEXT" => Ok(WebsocketEvent::Text(&resp_body[header_end + 2..])),
                     "BINARY" => Ok(WebsocketEvent::Binary(&resp_body[header_end + 2..])),
                     "PING" => Ok(WebsocketEvent::Ping),
-                    "PONG" => Ok(WebsocketEvent::Pong),
                     "CLOSE" => Ok(WebsocketEvent::Close),
                     "DISCONNECT" => Ok(WebsocketEvent::Disconnect),
                     _ => Err(WebsocketEventError::UnrecognizedCommand),
