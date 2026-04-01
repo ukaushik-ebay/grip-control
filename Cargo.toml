@@ -2,5 +2,12 @@
 name = "grip-control"
 version = "0.1.0"
 edition = "2024"
+license = "MIT OR Apache-2.0"
+description = "A Rust crate for grip control."
+repository = "https://github.com/your-username/grip-control"
+homepage = "https://github.com/your-username/grip-control"
+readme = "README.md"
+keywords = ["grip", "control"]
+categories = ["api-bindings"]
 
 [dependencies]
