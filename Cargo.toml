@@ -9,6 +9,3 @@ homepage = "https://github.com/ukaushik-ebay/grip-control"
 readme = "README.md"
 keywords = ["grip", "control", "fastly"]
 categories = ["api-bindings"]
-
-[dependencies]
-serde_json = "1.0.149"

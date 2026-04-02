@@ -1,5 +1,3 @@
-use serde_json::json;
-
 pub fn ws_control(kind: &str) -> Vec<u8> {
     format!("{kind}\r\n").into_bytes()
 }
@@ -11,10 +9,6 @@ pub fn ws_text(msg: &str) -> Vec<u8> {
 
 /// Returns a TEXT-wrapped GRIP subscription command for the given channel
 pub fn ws_sub(ch: &str) -> Vec<u8> {
-    let payload = json!({
-        "type": "subscribe",
-        "channel": ch
-    });
-    let control_msg = format!("c:{payload}");
+    let control_msg = format!("c:{{\"type\":\"subscribe\",\"channel\":\"{}\"}}", ch);
     ws_text(&control_msg)
 }
