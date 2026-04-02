@@ -11,3 +11,4 @@ keywords = ["grip", "control", "fastly"]
 categories = ["api-bindings"]
 
 [dependencies]
+serde_json = "1.0.149"
