@@ -1,8 +1,8 @@
+/// Returns a WebSocket-over-HTTP formatted control message
 pub fn ws_control(kind: &str) -> Vec<u8> {
     format!("{kind}\r\n").into_bytes()
 }
 
-/// Returns a WebSocket-over-HTTP formatted TEXT message
 pub fn ws_text(msg: &str) -> Vec<u8> {
     format!("TEXT {:x}\r\n{}\r\n", msg.len(), msg).into_bytes()
 }
