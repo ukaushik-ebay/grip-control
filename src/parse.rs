@@ -1,5 +1,6 @@
 use crate::error::WebsocketEventError;
 
+#[derive(Debug)]
 pub enum WebsocketEvent<'a> {
     Open,
     Text(&'a [u8]),
