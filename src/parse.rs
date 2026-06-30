@@ -27,7 +27,7 @@ impl<'a> WebsocketEvent<'a> {
             "OPEN" => Ok(WebsocketEvent::Open),
             "PING" => Ok(WebsocketEvent::Ping),
             "DISCONNECT" => Ok(WebsocketEvent::Disconnect),
-            "TEXT" | "BINARY" | "CLOSE" => {
+            "TEXT" | "BINARY" => {
                 let len_hex = parts.next().ok_or(WebsocketEventError::MissingLength)?;
                 let len = usize::from_str_radix(len_hex, 16)
                     .map_err(|_| WebsocketEventError::InvalidLength)?;
@@ -48,11 +48,32 @@ impl<'a> WebsocketEvent<'a> {
                 match command {
                     "TEXT" => Ok(WebsocketEvent::Text(body)),
                     "BINARY" => Ok(WebsocketEvent::Binary(body)),
-                    "CLOSE" => Ok(WebsocketEvent::Close(body)),
                     _ => unreachable!(),
                 }
             }
 
+            "CLOSE" => match parts.next() {
+                None => Ok(WebsocketEvent::Close(&[])),
+                Some(len_hex) => {
+                    let len = usize::from_str_radix(len_hex, 16)
+                        .map_err(|_| WebsocketEventError::InvalidLength)?;
+
+                    let body_start = header_end + 2;
+                    let body_end = body_start + len;
+
+                    if resp_body.len() < body_end + 2 {
+                        return Err(WebsocketEventError::TruncatedBody);
+                    }
+
+                    let body = &resp_body[body_start..body_end];
+
+                    if &resp_body[body_end..body_end + 2] != b"\r\n" {
+                        return Err(WebsocketEventError::MissingTrailingCrlf);
+                    }
+
+                    Ok(WebsocketEvent::Close(body))
+                }
+            },
             _ => Err(WebsocketEventError::UnrecognizedCommand),
         }
     }
@@ -88,6 +109,14 @@ mod test {
         let frame = b"CLOSE 2\r\n\x03\xe8\r\n";
         let event = WebsocketEvent::parse_frame(frame).expect("Parsing CLOSE frame failed.");
         assert!(matches!(event, WebsocketEvent::Close(_)));
+    }
+
+    #[test]
+    fn parse_close_no_body() {
+        let frame = b"CLOSE\r\n\r\n";
+        let event =
+            WebsocketEvent::parse_frame(frame).expect("Parsing CLOSE frame (no body) failed.");
+        assert!(matches!(event, WebsocketEvent::Close(&[])));
     }
 
     #[test]
